@@ -1,0 +1,618 @@
+#+title Emacs Config
+#+PROPERTY: header-args:emacs-lisp :tangle /Users/colecappello/.emacs.d/init.el
+
+* Package System Setup
+
+#+begin_src emacs-lisp
+
+  ; Initialize package sources
+  (require 'package)
+
+  (setq package-archives '(("melpa" . "https://melpa.org/packages/")
+                             ("org" . "https://orgmode.org/elpa/")
+                             ("elpa" . "https://elpa.gnu.org/packages/")))
+
+  (package-initialize)
+  (unless package-archive-contents
+    (package-refresh-contents))
+  
+  ; Initialize use-package on non-linux platforms
+  (unless (package-installed-p 'use-package)
+    (package-install 'use-package))
+
+  (require 'use-package)
+  (setq use-package-always-ensure t)
+
+#+end_src
+
+* Basic UI Config
+
+#+begin_src emacs-lisp
+
+  (setq inhibit-startup-message t)
+
+  (scroll-bar-mode -1)  ;disable scrollbar
+  (tool-bar-mode -1)    ;disable toolbar
+  (tooltip-mode -1)     ;disable tooltips
+  (set-fringe-mode 10)  ;Give breathing room
+
+  (menu-bar-mode -1)    ;Disable menu bar
+
+                                          ;Control amount of scrolling
+  (setq  next-screen-context-lines 20)
+
+  ;; Set up visible bell
+                                          ;(setq visible-bell t)
+
+  (set-face-attribute 'default nil :font "Fira Code" :height 140)  
+
+  (column-number-mode)
+  (global-display-line-numbers-mode t)
+
+  (dolist (mode '(org-mode-hook
+                  pdf-view-mode-hook
+                  treemacs-mode-hook
+                  term-mode-hook
+                  shell-mode-hook
+                  eshell-mode-hook))
+    (add-hook mode (lambda () (display-line-numbers-mode 0))))
+
+#+end_src
+
+* UI Config
+
+** Color Theme
+#+begin_src emacs-lisp
+
+  (use-package doom-themes
+    :init(load-theme 'doom-palenight t))
+
+#+end_src
+
+** Better Modeline
+#+begin_src emacs-lisp
+
+  (use-package all-the-icons)
+
+  (use-package doom-modeline
+    :ensure t
+    :init (doom-modeline-mode 1)
+    :custom (doom-modeline-height 15))
+
+#+end_src
+
+** Which Key
+#+begin_src emacs-lisp
+
+  (use-package which-key
+    :init (which-key-mode)
+    :diminish which-key-mode
+    :config
+    (setq which-key-idle-delay .3))
+
+#+end_src
+
+** Ivy and Counsel
+#+begin_src emacs-lisp
+
+    (use-package counsel
+      :bind(("M-x" . counsel-M-x)
+            ("C-x b" . counsel-ibuffer)
+            ("C-x C-f" . counsel-find-file)
+            :map minibuffer-local-map
+            ("C-r" . counsel-minibuffer-history))
+      :config
+      (setq ivy-initial-inputs-alist nil))
+
+
+    (use-package ivy
+      :diminish
+      :bind (("C-s" . swiper)
+             :map ivy-minibuffer-map
+             ("TAB" . ivy-alt-done)	
+             ("C-l" . ivy-alt-done)
+             ("C-j" . ivy-next-line)
+             ("C-k" . ivy-previous-line)
+             :map ivy-switch-buffer-map
+             ("C-k" . ivy-previous-line)
+             ("C-l" . ivy-done)
+             ("C-d" . ivy-switch-buffer-kill)
+             :map ivy-reverse-i-search-map
+             ("C-k" . ivy-previous-line)
+             ("C-d" . ivy-reverse-i-search-kill))
+      :init
+      (ivy-mode 1))
+
+  (use-package ivy-rich
+    :init
+    (ivy-rich-mode 1))
+
+  (use-package ivy-prescient
+    :after counsel
+    :config (ivy-prescient-mode 1))
+
+#+end_src
+
+** Helpful
+
+#+begin_src emacs-lisp
+
+  (use-package helpful
+    :custom
+    (counsel-describe-function-function #'helpful-callable)
+    (counsel-describe-variable-function #'helpful-variable)
+    :bind
+    ([remap describe-function] . counsel-describe-function)
+    ([remap describe-command] . helpful-command)
+    ([remap describe-variable] . counsel-describe-variable)
+    ([remap describe-key] . helpful-key))
+
+#+end_src
+
+* Org Mode
+** Basic Config
+#+begin_src emacs-lisp
+
+  (defun cc/org-mode-setup ()
+    (org-indent-mode)
+    (visual-line-mode 1))
+
+  ; can use this setting to play with font of org mode
+  ; (variable-pitch-mode 1)
+
+
+  (use-package org
+    :hook (org-mode . cc/org-mode-setup) 
+    :config
+
+    (setq org-refile-targets
+      '(("~/Code/Org Mode/Archive.org" :maxlevel . 1)
+        ("~/Code/Org Mode/Tasks.org" :maxlevel . 1)))
+
+    ;save org files after refiling
+    (advice-add 'org-refile :after 'org-save-all-org-buffers)
+
+    (setq org-agenda-start-with-log-mode t)
+    (setq org-log-done 'time)
+    (setq org-log-into-drawer t)
+  
+    (setq org-agenda-files
+          '("~/Code/Org Mode/Tasks.org"
+            "~/Code/Org Mode/Teaching.org"
+            "~/Code/Org Mode/Habits.org"
+            "~/Code/Org Mode/Classes.org"))
+
+    (require 'org-habit)
+    (add-to-list 'org-modules 'org-habit)
+    (setq org-habit-graph-column 60)
+  
+     (setq org-tag-alist
+      '((:startgroup)
+         ; Put mutually exclusive tags here
+         (:endgroup)
+         ("@errand" . ?E)
+         ("@home" . ?H)
+         ("@work/school" . ?W)))
+   
+    (setq org-agenda-custom-commands
+          (setq org-capture-templates
+      `(("t" "Tasks / Projects")
+        ("tt" "Task" entry (file+olp "~/Code/Org Mode/Tasks.org" "Inbox")
+         "* TODO  %?\n  %U\n  %a\n  %i" :empty-lines 1)
+        ("ts" "Active Timestamp Task" entry (file+olp "~/Code/Org Mode/Tasks.org" "Inbox")
+         "* TODO %^t  %?\n  %U\n  %a\n  %i" :empty-lines 1))))
+  
+  
+    (setq org-ellipsis " ▾"))
+
+  (global-set-key (kbd "C-c l") #'org-store-link)
+  (global-set-key (kbd "C-c a") #'org-agenda)
+  (global-set-key (kbd "C-c c") #'org-capture)
+
+#+end_src
+
+** Nicer Heading Bullets
+
+#+begin_src emacs-lisp
+
+  (use-package org-bullets
+    :after org
+    :hook (org-mode . org-bullets-mode)
+
+  
+    :custom
+    (org-bullets-bullet-list '("◉" "○" "●" "○" "●" "○" "●")))
+
+#+end_src
+
+** Center Org Buffers
+
+#+begin_src emacs-lisp
+
+  (defun cc/org-mode-visual-fill ()
+    (setq visual-fill-column-width 100
+          visual-fill-column-center-text t)
+    (visual-fill-column-mode 1))
+
+  (use-package visual-fill-column
+    :hook (org-mode . cc/org-mode-visual-fill))
+
+#+end_src
+
+** Configure Babel Languages
+
+#+begin_src emacs-lisp
+
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((R . t)
+     (emacs-lisp . t)
+     (python . t)))
+
+#+end_src
+
+** Structure Templates
+- Easily add code blocks to org files using C-c C-,
+  
+- :session can be set to a string to link code blocks to same session
+- :results output is so that the results use the output of print function for python.  Might want :results value for R when you can try it
+  
+#+begin_src emacs-lisp
+  (require 'org-tempo)
+
+  (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
+  (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp\n"))
+  (add-to-list 'org-structure-template-alist '("py" . "src python :session *python* :results output\n"))
+  (add-to-list 'org-structure-template-alist '("R" . "src R :session *R* :results output\n"))
+
+#+end_src
+
+** Auto-Tangle Config Files
+
+#+begin_src emacs-lisp
+
+  ;; Automatically tangle our Emacs.org config file when we save it
+
+  
+  (defun efs/org-babel-tangle-config ()
+    (when (string-equal (buffer-file-name)
+                        (expand-file-name "~/.emacs.d/Emacs-Config.org"))
+      ;; Dynamic scoping to the rescue
+      (let ((org-confirm-babel-evaluate nil))
+        (org-babel-tangle))))
+
+  (add-hook 'org-mode-hook (lambda () (add-hook 'after-save-hook #'efs/org-babel-tangle-config)))
+
+#+end_src
+
+#+RESULTS:
+| #[0 \301\211\207 [imenu-create-index-function org-imenu-get-tree] 2] | (lambda nil (add-hook 'after-save-hook #'efs/org-babel-tangle-config)) | org-tempo-setup | org-bullets-mode | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-fold-show-all append local] 5] | #[0 \300\301\302\303\304$\207 [add-hook change-major-mode-hook org-babel-show-result-all append local] 5] | org-babel-result-hide-spec | org-babel-hide-all-hashes | cc/org-mode-visual-fill | cc/org-mode-setup | (lambda nil (display-line-numbers-mode 0)) |
+
+* Development
+** lsp-mode
+
+#+begin_src emacs-lisp
+
+    (defun efs/lsp-mode-setup ()
+      (setq lsp-headerline-breadcrumb-segments '(path-up-to-project file symbols))
+      (lsp-headerline-breadcrumb-mode))
+
+    (use-package lsp-mode
+      :commands (lsp lsp-deferred)
+      :hook
+      (lsp-mode . efs/lsp-mode-setup)
+      ;(ess-r-mode . lsp-deferred)       
+      :init
+      (setq lsp-keymap-prefix "C-c l")  ;; Or 'C-l', 's-l'
+      :config
+      (lsp-enable-which-key-integration t))
+
+#+end_src
+
+** lsp-ui
+
+#+begin_src emacs-lisp
+
+  (use-package lsp-ui
+    :hook (lsp-mode . lsp-ui-mode)
+    :custom
+    (lsp-ui-doc-position 'bottom))
+
+#+end_src
+
+** lsp-treemacs
+
+#+begin_src emacs-lisp
+
+  (use-package lsp-treemacs
+    :after lsp)
+
+#+end_src
+
+** Projectile
+
+#+begin_src emacs-lisp
+
+(use-package projectile
+  :diminish projectile-mode
+  :config (projectile-mode)
+  :custom ((projectile-completion-system 'ivy))
+  :bind-keymap
+  ("C-c p" . projectile-command-map)
+  :init
+  ;; NOTE: Set this to the folder where you keep your Git repos!
+  (when (file-directory-p "~/Code")
+    (setq projectile-project-search-path '("~/Code")))
+  (setq projectile-switch-project-action #'projectile-dired))
+
+(use-package counsel-projectile
+  :config (counsel-projectile-mode))
+
+#+end_src
+
+** Magit
+
+#+begin_src emacs-lisp
+(setq auth-sources '("~/.authinfo"))
+
+(use-package magit
+  :custom
+  (magit-display-buffer-function #'magit-display-buffer-same-window-except-diff-v1))
+
+;; NOTE: Make sure to configure a GitHub token before using this package!
+;; - https://magit.vc/manual/forge/Token-Creation.html#Token-Creation
+;; - https://magit.vc/manual/ghub/Getting-Started.html#Getting-Started
+(use-package forge)
+
+#+end_src
+
+#+RESULTS:
+| ~/.authinfo |
+
+** Python Config
+
+- Pyright is installed in /opt/homebrew/Cellar/pyright/1.1.389 
+- Pyright was installed in terminal with the command "brew install pyright"
+
+***virtual environment is set in ~/Code/pyrightConfig.json***
+
+#+begin_src emacs-lisp
+
+  ;See lsp-mode pyright github for info
+  (use-package lsp-pyright
+    :ensure t
+    :custom (lsp-pyright-langserver-command "pyright")  ;; or basedpyright
+    ;(lsp-pyright-venv-path '"/opt/anaconda3/envs/")
+  
+    :hook (python-mode . (lambda ()
+                            (require 'lsp-pyright)
+                            (lsp-deferred))))  ; or lsp-deferred
+
+#+end_src
+
+The following conda package allows conda environments to be used in python shells and org mode code blocks. M-x *conda-env-activate* must be run to access the environments
+
+#+begin_src emacs-lisp
+
+  ;See github for conda.el
+  (use-package conda
+    :ensure t
+    :config
+    (conda-env-initialize-interactive-shells)
+    (conda-env-initialize-eshell)
+
+    :custom
+    (conda-anaconda-home '"/opt/anaconda3/"))
+
+#+end_src
+
+** ESS Config
+
+Support for R 
+#+begin_src emacs-lisp
+
+  (use-package ess
+    :ensure t
+    :init
+    (require 'ess-r-mode))
+
+#+end_src
+
+Polymode for editing Rmd files.  But lsp integration seems to be a problem.
+
+#+begin_src emacs-lisp
+
+  (use-package polymode
+    :ensure t)
+    ;:init (setq poly-mode-lsp-integration nil)
+
+#+end_src
+
+
+#+begin_src emacs-lisp
+
+
+       (defun my-rstudio-layout () ""
+              (interactive)
+              (add-to-list 'display-buffer-alist
+                           '((derived-mode . ess-mode)
+                             (disply-buffer-reuse-window)
+                             (side .  left)
+                             (slot . -1)
+                             (dedicated . t)
+                             (tab-group . "rstudio-1")))
+
+              (add-to-list 'display-buffer-alist
+                           `("^\\*help\\[R\\]"
+                             (display-buffer-reuse-mode-window  display-buffer-in-side-window)
+                             (mode . '(ess-help-mode));xwidget-webkit-mode
+                             (side . right)
+                             (slot . 1)
+                             (window-width . 0.33)
+                             (dedicated . nil)))
+
+              (add-to-list 'display-buffer-alist              
+                     '((derived-mode . dired-mode)
+                     (display-buffer-reuse-mode-window  display-buffer-in-side-window)
+  ;                  (mode . '(dired-mode));xwidget-webkit-mode
+                     (side . right)
+                     (slot . 1)
+                     (window-width . 0.33)
+                     (dedicated . nil)))
+
+              (add-to-list 'display-buffer-alist
+                           `("^\\*R.*\\*"
+                             (display-buffer-reuse-mode-window display-buffer-at-bottom)
+                             (mode . ess-mode)
+                             (window-width . 0.5)
+                             (window-height . 0.25)
+                             (dedicated . t)
+                             (tab-group "rstudio-3")))
+
+              (add-to-list 'display-buffer-alist
+                           `("^\\*R dired\\*"
+                             (display-buffer-reuse-mode-window display-buffer-in-side-window)
+                             (mode . ess-rdired-mode)
+                             (side . right)
+                             (slot . -1)
+                             (window-width . 0.33)
+                             (dedicated . t)
+                             (reusable-frames . nil)
+                             (tab-group . "rstudio-2")))
+
+              (let ((ess-startup-directory 'default-directory)
+                    (ess-ask-for-ess-directory nil))
+                (delete-other-windows)
+                (ess-switch-to-ESS t)
+                (ess-rdired)
+                (ess-help "help")
+                (tab-line-mode 1)
+                (my-start-hdg)))
+
+#+end_src
+
+** Company
+This package allows for instant completion in lsp IDEs
+
+#+begin_src emacs-lisp
+
+  (use-package company
+    :after lsp-mode
+    :hook
+    (lsp-mode . company-mode)
+    (ess-r-mode . company-mode)
+    :bind (:map company-active-map
+           ("<tab>" . company-complete-selection))
+          (:map lsp-mode-map
+           ("<tab>" . company-indent-or-complete-common))
+    :custom
+    (company-minimum-prefix-length 1)
+    (company-idle-delay 0.0))
+
+  (use-package company-box
+    :hook (company-mode . company-box-mode))
+
+  (use-package prescient)
+
+  ;Autocompletions sorted by most used
+  (use-package company-prescient
+    :after company
+    :config (company-prescient-mode 1))
+
+#+end_src
+
+** Rainbow Delimiters
+
+#+begin_src emacs-lisp
+
+  (use-package rainbow-delimiters
+    :hook (prog-mode . rainbow-delimiters-mode))
+
+#+end_src
+
+** PDF-Tools
+
+#+begin_src emacs-lisp
+
+  (use-package pdf-tools
+    :ensure t)
+  (pdf-tools-install)
+#+end_src
+* File Management
+** Group Directories
+Installed coreutils with brew
+
+#+begin_src emacs-lisp
+
+  (setq insert-directory-program "gls" 
+        dired-use-ls-dired t)
+
+#+end_src
+
+** Dired
+
+#+begin_src emacs-lisp
+
+  (use-package dired
+    :ensure nil
+    :commands(dired dired-jump)
+    :hook (dired-mode . dired-omit-mode)
+    :bind (:map dired-mode-map
+            ( "."     . dired-omit-mode))                 ;Set "." to toggle omit mode
+    :custom ((dired-listing-switches "-agho --group-directories-first")
+             (dired-kill-when-opening-new-dired-buffer t) ;Only one dired buffer at a time
+             (dired-omit-files (rx (seq bol ".")))))  
+
+#+end_src
+* Misc/Archive
+** Load EAF Core
+
++begin_src emacs-lisp
+
+  (use-package eaf
+    :load-path "~/.emacs.d/site-lisp/emacs-application-framework"
+    :custom
+    ; See https://github.com/emacs-eaf/emacs-application-framework/wiki/Customization
+    (eaf-browser-continue-where-left-off t)
+    (eaf-browser-enable-adblocker t)
+    (browse-url-browser-function 'eaf-open-browser)
+    :config
+    (defalias 'browse-web #'eaf-open-browser)
+    (eaf-bind-key scroll_up "C-n" eaf-pdf-viewer-keybinding)
+    (eaf-bind-key scroll_down "C-p" eaf-pdf-viewer-keybinding)
+    (eaf-bind-key take_photo "p" eaf-camera-keybinding)
+    (eaf-bind-key nil "M-q" eaf-browser-keybinding)) ;; unbind, see more in the Wiki
+  
++end_src
+
+** Load EAF Apps
+
++begin_src emacs-lisp
+
+  (require 'eaf-music-player)
+  (require 'eaf-js-video-player)
+  (require 'eaf-rss-reader)
+  (require 'eaf-image-viewer)
+  (require 'eaf-pdf-viewer)
+  (require 'eaf-browser)
+  (require 'eaf-markdown-previewer)
+  (require 'eaf-video-player)
+  (require 'eaf-org-previewer)
+  (require 'eaf-jupyter)
+  (require 'eaf-git)
+  (require 'eaf-system-monitor)
+  (require 'eaf-pyqterminal)
+  
++end_src
+
+** MacOS EAF Code
+
++begin_src emacs-lisp
+
+    (use-package exec-path-from-shell)
+    (require 'exec-path-from-shell)
+    (exec-path-from-shell-initialize)
+
++end_src
+
+** Attempted to set up Emacs-webkit and straight-use-package

@@ -1,0 +1,51 @@
+((:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "0c/add17a-bbe7-4962-b9ee-e728a2414952" :associated
+  (:hash "84d15803efabf062039cf90ff696bd47" :file "/Users/colecappello/Code/Org Mode/Tasks.org~" :inode 2637954)
+  :expiry 30 :last-access 1735272327.43227 :last-access-hr "2024-12-26T23:05:27-0500")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "18/9d7c9f-84af-4e16-a41e-62a23119104d" :associated
+  (:hash "d2c5f88d5775736b63c11669dbb29c9c" :file "/Users/colecappello/Code/R_Programs/STAT 505 - Linear Models/Final_Notes.org" :inode 2463157)
+  :expiry 30 :last-access 1734050232.601012 :last-access-hr "2024-12-12T17:37:12-0700")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "50/f3b519-0b8a-4caa-8421-a8d8f69ff840" :associated
+  (:hash "3ca1d9a71bd7b0ea808991f18d8aa821" :file "/Users/colecappello/Code/R_Programs/EmacsR_Notes.org" :inode 6072281)
+  :expiry 30 :last-access 1735929853.112912 :last-access-hr "2025-01-03T11:44:13-0700")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "3e/01ca89-3c99-4750-920a-2e2f542a4fc4" :associated
+  (:hash "475c5630e209c2069d501b7129031ec2" :file "/Users/colecappello/Code/Org Mode/Habits.org" :inode 2650212)
+  :expiry 30 :last-access 1735856708.342455 :last-access-hr "2025-01-02T15:25:08-0700")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "68/0ce310-dc26-4db7-ac1a-99e4b7d750eb" :associated
+  (:hash "717e564044dae7bff433bd57d127cf18" :file "/Users/colecappello/Code/Org Mode/Classes.org" :inode 1837614)
+  :expiry 30 :last-access 1735856708.343631 :last-access-hr "2025-01-02T15:25:08-0700")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "be/af22c1-3f1b-41de-8baa-ab97de882ee7" :associated
+  (:hash "c22dc455bc05fd3784ffa99e44e25cdb" :file "/Users/colecappello/Code/Org Mode/Teaching.org" :inode 2111432)
+  :expiry 30 :last-access 1735856708.345047 :last-access-hr "2025-01-02T15:25:08-0700")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "78/1f9267-6b64-4252-bbbc-f83d73b8985d" :associated
+  (:hash "c0ed032522952d5b3271e723b53ae65f" :file "/Users/colecappello/Code/Org Mode/Archive.org" :inode 6072282)
+  :expiry 30 :last-access 1735856708.416057 :last-access-hr "2025-01-02T15:25:08-0700")
+ (:container
+  ((elisp org-element--headline-cache)
+   (elisp org-element--cache))
+  :persist-file "49/8b0a44-cda9-4866-bebf-f86fe2bf7795" :associated
+  (:hash "e020e506add87ee9f95313241d328375" :file "/Users/colecappello/Code/Org Mode/Tasks.org" :inode 6069967)
+  :expiry 30 :last-access 1735856708.416852 :last-access-hr "2025-01-02T15:25:08-0700")
+ (:container
+  ((index "3.1"))
+  :persist-file "25/844bfa-1ef5-4cb7-9009-ced17115df9a" :associated nil :expiry never :last-access 1735929853.114508 :last-access-hr "2025-01-03T11:44:13-0700"))

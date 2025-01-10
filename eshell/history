@@ -1,0 +1,17 @@
+pandoc GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+lualatex GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+pdflatex GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+pdflatex GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+pdflatex GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+xelatex GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+xelatex GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+pdflatex GradSchoolResumeStatisticsOriented.tex -o Resume2.pdf
+pdftex GradSchoolResumeStatisticsOriented.tex -progname=Resume2
+pdftex -jobname=Resume2 GradSchoolResumeStatisticsOriented.tex 
+pdflatex -jobname=Resume2 GradSchoolResumeStatisticsOriented.tex 
+pdflatex -jobname=Resume2 GradSchoolResumeStatisticsOriented.tex 
+pdflatex -jobname=Resume2 GradSchoolResumeStatisticsOriented.tex 
+pandoc Academic_Transcript.pdf printTranscript.pdf
+pandoc Academic_Transcript.pdf printTranscript.pdf -o AllTranscripts.pdf
+pdftk
+pdfunite Academic_Transcript.pdf printTranscript.pdf AllTranscripts.pdf

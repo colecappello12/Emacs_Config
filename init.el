@@ -188,7 +188,7 @@
 
 (add-to-list 'org-structure-template-alist '("sh" . "src shell"))
 (add-to-list 'org-structure-template-alist '("el" . "src emacs-lisp\n"))
-(add-to-list 'org-structure-template-alist '("py" . "src python :session *python* :results output\n"))
+(add-to-list 'org-structure-template-alist '("py" . "src python :session *Python* :results output\n"))
 (add-to-list 'org-structure-template-alist '("R" . "src R :session *R* :results output\n"))
 
 ;; Automatically tangle our Emacs.org config file when we save it
@@ -196,7 +196,7 @@
 
 (defun efs/org-babel-tangle-config ()
   (when (string-equal (buffer-file-name)
-                      (expand-file-name "~/.emacs.d/Emacs-Config.org"))
+                      (expand-file-name "~/.emacs.d/Emacs_Config.org"))
     ;; Dynamic scoping to the rescue
     (let ((org-confirm-babel-evaluate nil))
       (org-babel-tangle))))
@@ -276,11 +276,19 @@
   :init
   (require 'ess-r-mode))
 
-(use-package polymode
+(use-package poly-R
   :ensure t)
   ;:init (setq poly-mode-lsp-integration nil)
 
-(defun my-rstudio-layout () ""
+;  (add-hook 'ess-r-mode-hook #'my-rstudio-layout)
+;  (add-hook 'find-file-hook #'rstudio-Rmd)
+
+;  (defun rstudio-Rmd ()
+;    (when (and (stringp buffer-file-name)
+;               (string-match "\\.Rmd\\'" buffer-file-name))
+;      (my-rstudio-layout)))
+
+  (defun my-rstudio-layout () ""
             (interactive)
             (add-to-list 'display-buffer-alist
                          '((derived-mode . ess-mode)
@@ -330,7 +338,7 @@
 
             (let ((ess-startup-directory 'default-directory)
                   (ess-ask-for-ess-directory nil))
-              (delete-other-windows)
+;              (delete-other-windows)
               (ess-switch-to-ESS t)
               (ess-rdired)
               (ess-help "help")
@@ -353,7 +361,9 @@
 (use-package company-box
   :hook (company-mode . company-box-mode))
 
-(use-package prescient)
+(use-package prescient
+  :config
+  (prescient-persist-mode 1))
 
 ;Autocompletions sorted by most used
 (use-package company-prescient

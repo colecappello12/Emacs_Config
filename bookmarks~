@@ -1,0 +1,11 @@
+;;;; Emacs Bookmark Format Version 1;;;; -*- coding: utf-8-emacs; mode: lisp-data -*-
+;;; This format is meant to be slightly human-readable;
+;;; nevertheless, you probably don't want to edit it.
+;;; -*- End Of Bookmark File Format Version Stamp -*-
+(("org-refile-last-stored"
+ (filename . "~/Code/Org Mode/Tasks.org")
+ (front-context-string . "** TODO [[https:")
+ (rear-context-string . "2025-01-06 Mon>\n")
+ (position . 152)
+ (last-modified 26492 46829 660572 0))
+)
